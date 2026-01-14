@@ -1,0 +1,27 @@
+package com.turkcell.soccer.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Soccer API")
+                        .version("1.0.0")
+                        .description("Soccer game project REST API documentation")
+                        .contact(new Contact()
+                                .name("Turkcell")
+                                .email("support@turkcell.com"))
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")));
+    }
+}
