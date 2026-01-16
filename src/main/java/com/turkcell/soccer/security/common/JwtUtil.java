@@ -1,4 +1,4 @@
-package com.turkcell.soccer.security;
+package com.turkcell.soccer.security.common;
 
 import com.turkcell.soccer.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;

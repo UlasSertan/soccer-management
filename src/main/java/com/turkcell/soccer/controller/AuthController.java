@@ -1,9 +1,9 @@
 package com.turkcell.soccer.controller;
 
-import com.turkcell.soccer.dto.AuthRequest;
+import com.turkcell.soccer.dto.request.AuthRequest;
 import com.turkcell.soccer.model.Account;
 import com.turkcell.soccer.service.AccountService;
-import com.turkcell.soccer.security.JwtUtil;
+import com.turkcell.soccer.security.common.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-
+    // Login
     @PostMapping("/auth")
     public ResponseEntity<String> authenticateUser(@Valid @RequestBody AuthRequest authRequest) {
         Account account = accountService.authenticate(authRequest.getUsername(), authRequest.getPassword());

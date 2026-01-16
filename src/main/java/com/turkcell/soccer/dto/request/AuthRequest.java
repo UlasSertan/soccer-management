@@ -1,4 +1,4 @@
-package com.turkcell.soccer.dto;
+package com.turkcell.soccer.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;

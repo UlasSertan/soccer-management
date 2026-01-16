@@ -1,8 +1,10 @@
 package com.turkcell.soccer.controller;
 
-import com.turkcell.soccer.dto.AccountRequest;
-import com.turkcell.soccer.dto.AccountResponse;
+import com.turkcell.soccer.dto.request.AccountRequest;
+import com.turkcell.soccer.dto.response.AccountResponse;
+import com.turkcell.soccer.dto.request.PermissionAssignmentRequest;
 import com.turkcell.soccer.service.AccountService;
+import com.turkcell.soccer.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final AccountService accountService;
+    private final RoleService roleService;
 
     @Autowired
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, RoleService roleService) {
         this.accountService = accountService;
+        this.roleService = roleService;
     }
 
     @Operation(
@@ -53,6 +58,22 @@ public class AccountController {
         }
     }
 
+    @DeleteMapping("/{name}")
+    @PreAuthorize("@accountSecurity.canDeleteAccount(#name)")
+    public ResponseEntity<?> deleteAccount(@PathVariable String name) {
+        accountService.deleteAccount(name);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> grantPermission(@RequestBody PermissionAssignmentRequest permissionAssignmentRequest) {
+        roleService.assignPermissions(
+                permissionAssignmentRequest.getRole(),
+                permissionAssignmentRequest.getPermission()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(permissionAssignmentRequest);
+    }
 
     // Inner class for error response
     private static class ErrorResponse {

@@ -1,5 +1,6 @@
-package com.turkcell.soccer.security;
+package com.turkcell.soccer.security.common;
 
+import com.turkcell.soccer.security.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,8 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+
+
             token = authHeader.substring(7);
             username = jwtUtil.extractUsername(token);
+
 
             // Check if previous filters have already authenticated the user
 

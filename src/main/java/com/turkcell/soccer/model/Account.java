@@ -28,6 +28,11 @@ public class Account {
         createdAt = LocalDateTime.now();
     }
 
+    // An account can have only one role
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Role role;
+
+
     // Constructors
     public Account() {
     }
@@ -78,4 +83,8 @@ public class Account {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public Role getRole() { return role; }
+
+    public void setRole(Role role) { this.role = role; }
 }
