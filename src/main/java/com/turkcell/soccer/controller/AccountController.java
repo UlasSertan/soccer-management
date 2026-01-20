@@ -1,6 +1,7 @@
 package com.turkcell.soccer.controller;
 
 import com.turkcell.soccer.dto.request.AccountRequest;
+import com.turkcell.soccer.dto.request.AccountUpdateRequest;
 import com.turkcell.soccer.dto.response.AccountResponse;
 import com.turkcell.soccer.dto.request.PermissionAssignmentRequest;
 import com.turkcell.soccer.service.AccountService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,14 +50,9 @@ public class AccountController {
             )
     })
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody AccountRequest request) {
-        try {
-            AccountResponse response = accountService.createAccount(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
+    public ResponseEntity<?> createAccount(@Valid @RequestBody AccountRequest request) {
+        AccountResponse response = accountService.createAccount(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{name}")
@@ -67,13 +64,25 @@ public class AccountController {
 
     @PostMapping("/roles")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> grantPermission(@RequestBody PermissionAssignmentRequest permissionAssignmentRequest) {
+    public ResponseEntity<?> grantPermission(@Valid @RequestBody PermissionAssignmentRequest permissionAssignmentRequest) {
         roleService.assignPermissions(
                 permissionAssignmentRequest.getRole(),
                 permissionAssignmentRequest.getPermission()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(permissionAssignmentRequest);
     }
+
+    @PatchMapping("/{name}")
+    @PreAuthorize("@accountSecurity.canUpdateAccount(#name)")
+    public ResponseEntity<?> updateAccount(@Valid @RequestBody AccountUpdateRequest request, @PathVariable String name) {
+        return ResponseEntity.ok().body(accountService.updateAccount(request, name));
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<?> getAccountInfo(@PathVariable String name) {
+        return ResponseEntity.ok().body(accountService.getAccountInfo(name));
+    }
+
 
     // Inner class for error response
     private static class ErrorResponse {

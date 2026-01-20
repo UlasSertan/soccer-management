@@ -26,6 +26,11 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok:1.18.42")
 	compileOnly("org.projectlombok:lombok:1.18.42")
 
+	// MapStruct
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
 	// JWT
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 

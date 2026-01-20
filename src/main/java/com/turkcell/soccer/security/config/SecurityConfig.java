@@ -36,7 +36,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/accounts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/accounts").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

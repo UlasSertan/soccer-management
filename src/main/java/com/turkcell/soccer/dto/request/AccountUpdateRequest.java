@@ -1,20 +1,19 @@
 package com.turkcell.soccer.dto.request;
 
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionAssignmentRequest {
+public class AccountUpdateRequest {
 
     @NotBlank
-    private String role;
+    private String password;
     @NotBlank
-    private String permission;
+    private String email;
+
+
 }

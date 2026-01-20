@@ -1,6 +1,5 @@
 package com.turkcell.soccer.dto.request;
 
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionAssignmentRequest {
+public class TeamRequest {
 
     @NotBlank
-    private String role;
+    private String teamName;
     @NotBlank
-    private String permission;
+    private String country;
 }

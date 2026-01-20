@@ -8,17 +8,8 @@ import org.springframework.stereotype.Component;
 @Component ("accountSecurity")
 public class AccountSecurity {
 
-    public boolean canDeleteAccount(String username) {
+    public boolean selfRequest(String username) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-
-        System.out.println(">>> canDeleteAccount CALLED");
-        System.out.println(">>> auth = " + auth);
-        System.out.println(">>> name = " + (auth != null ? auth.getName() : "null"));
-        System.out.println(">>> authenticated = " + (auth != null && auth.isAuthenticated()));
-        System.out.println(">>> authorities = " + (auth != null ? auth.getAuthorities() : "null"));
-        System.out.println(">>> target = " + username);
-
 
         if (auth == null || !auth.isAuthenticated()) {
             return false;
@@ -30,5 +21,17 @@ public class AccountSecurity {
         }
 
         return auth.getName().equals(username);
+    }
+
+    public boolean canDeleteAccount(String username) {
+        return selfRequest(username);
+    }
+
+    public boolean canUpdateAccount(String username) {
+        return selfRequest(username);
+    }
+
+    public boolean canSeeAccount(String username) {
+        return selfRequest(username);
     }
 }

@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -27,13 +30,20 @@ public class Team {
     private String country;
 
     @Min(0)
-    private Integer playerCount;
+    private Integer playerCount = 20;
 
     @Min(0)
-    private Integer teamValue;
+    private Integer budget = 5_000_000;
 
-    @Min(0)
-    private Integer budget;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team", cascade = CascadeType.ALL)
+    private List<Player> players = new ArrayList<>();
 
+    public int getTeamValue() {
+        int teamValue = 0;
+        for (Player player : players) {
+            teamValue += player.getValue();
+        }
+        return teamValue;
+    }
 
 }

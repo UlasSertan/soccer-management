@@ -1,17 +1,26 @@
 package com.turkcell.soccer.service;
 
 import com.turkcell.soccer.dto.request.AccountRequest;
+import com.turkcell.soccer.dto.request.AccountUpdateRequest;
+import com.turkcell.soccer.dto.response.AccountInfoResponse;
 import com.turkcell.soccer.dto.response.AccountResponse;
+import com.turkcell.soccer.dto.response.AccountUpdateResponse;
+import com.turkcell.soccer.mapper.AccountMapper;
 import com.turkcell.soccer.model.Account;
 import com.turkcell.soccer.model.Role;
 import com.turkcell.soccer.repository.AccountRepository;
 import com.turkcell.soccer.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 public class AccountService {
@@ -19,12 +28,15 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountMapper accountMapper;
 
     @Autowired
-    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AccountService(AccountRepository accountRepository, RoleRepository roleRepository,
+                          PasswordEncoder passwordEncoder, AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.accountMapper = accountMapper;
     }
 
     @Transactional
@@ -54,12 +66,7 @@ public class AccountService {
         Account savedAccount = accountRepository.save(account);
 
         // Convert to response DTO
-        return new AccountResponse(
-            savedAccount.getId(),
-            savedAccount.getUsername(),
-            savedAccount.getEmail(),
-            savedAccount.getCreatedAt()
-        );
+        return accountMapper.toAccountResponse(savedAccount);
     }
 
 
@@ -83,5 +90,48 @@ public class AccountService {
         }
 
         return account;
+    }
+
+    public AccountInfoResponse getAccountInfo(String accountName) {
+        Account account = accountRepository.findByUsername(accountName).orElseThrow(
+                () -> new UsernameNotFoundException("Username not found: " + accountName)
+        );
+
+        return accountMapper.toAccountInfoResponse(account);
+    }
+
+    public AccountUpdateResponse updateAccount(AccountUpdateRequest updateRequest, String username) {
+        Account account = accountRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Username not found: " + username)
+        );
+
+        if (updateRequest.getPassword() != null) {
+            account.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+        }
+        if (updateRequest.getEmail() != null) {
+            account.setEmail(updateRequest.getEmail());
+        }
+
+        Account saved = accountRepository.save(account);
+
+
+        return accountMapper.toAccountUpdateResponse(saved);
+
+    }
+
+    public Account getAccount() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthenticationCredentialsNotFoundException(
+                    "No authentication found in security context");
+        }
+
+        String username = authentication.getName();
+
+
+        return accountRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Username not found")
+        );
     }
 }

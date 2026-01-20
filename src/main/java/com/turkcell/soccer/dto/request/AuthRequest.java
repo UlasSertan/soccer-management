@@ -2,10 +2,12 @@ package com.turkcell.soccer.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString(exclude = "password")
 public class AuthRequest {
     @NotBlank

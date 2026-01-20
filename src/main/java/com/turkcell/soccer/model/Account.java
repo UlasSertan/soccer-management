@@ -32,6 +32,9 @@ public class Account {
     @ManyToOne(fetch = FetchType.EAGER)
     private Role role;
 
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn (name= "team_id", unique = true)
+    private Team team = null;
 
     // Constructors
     public Account() {
@@ -87,4 +90,12 @@ public class Account {
     public Role getRole() { return role; }
 
     public void setRole(Role role) { this.role = role; }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 }
