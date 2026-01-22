@@ -17,6 +17,11 @@ import java.util.List;
 @Entity
 @Table(name = "teams")
 public class Team {
+
+    // To prevent racing conditions - double purchases
+    @Version
+    private Long version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,8 +40,13 @@ public class Team {
     @Min(0)
     private Integer budget = 5_000_000;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Player> players = new ArrayList<>();
+
+    public void removePlayer(Player player) {
+        players.remove(player);
+        player.setTeam(null);
+    }
 
     public int getTeamValue() {
         int teamValue = 0;

@@ -48,6 +48,9 @@ public class Player {
     @JoinColumn (name = "team_id", nullable = false)
     private Team team;
 
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TransferList transferList;
+
     public Player(String firstName, String lastName, String country, Integer age, String position) {
         this.firstName = firstName;
         this.lastName = lastName;

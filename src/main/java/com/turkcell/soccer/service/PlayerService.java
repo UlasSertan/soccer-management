@@ -8,12 +8,15 @@ import com.turkcell.soccer.exception.NoSuchTeamException;
 import com.turkcell.soccer.mapper.TeamMapper;
 import com.turkcell.soccer.model.Player;
 import com.turkcell.soccer.model.Team;
+import com.turkcell.soccer.model.TransferList;
 import com.turkcell.soccer.repository.PlayerRepository;
 import com.turkcell.soccer.mapper.PlayerMapper;
 import com.turkcell.soccer.repository.TeamRepository;
+import com.turkcell.soccer.repository.TransferListRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -42,17 +45,10 @@ public class PlayerService {
 
     @Transactional
     public PlayerDto getPlayer(Long id) {
-        List<PlayerDto> players = getAllPlayers();
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new NoSuchPlayerException("Player with id " + id + " not found"));
 
-        for (PlayerDto player : players) {
-            if (player.getId().equals(id)) {
-                return player;
-            }
-
-        }
-
-        throw new NoSuchPlayerException("Player with name " + id + " not found");
-
+        return playerMapper.playerToDto(player);
     }
 
     @Transactional
@@ -79,11 +75,17 @@ public class PlayerService {
 
     @Transactional
     public void deletePlayer(Long id) {
+        System.out.println("TX ACTIVE: " +
+                TransactionSynchronizationManager.isActualTransactionActive());
         Player player = playerRepository.findById(id).orElseThrow(
                 () ->  new NoSuchPlayerException("Player with id " + id + " not found")
         );
-
-        playerRepository.delete(player);
+        player.getTeam().removePlayer(player);
+        TransferList transferList = player.getTransferList();
+        if (transferList != null) {
+            transferList.setPlayer(null);
+        }
+        playerRepository.deleteById(id);
     }
 
     private void setPlayerFields(PlayerRequest playerRequest, Player player) {

@@ -119,13 +119,19 @@ public class AccountService {
 
     }
 
-    public Account getAccount() {
-
+    public Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AuthenticationCredentialsNotFoundException(
                     "No authentication found in security context");
         }
+
+        return authentication;
+    }
+
+    public Account getAccount() {
+
+        Authentication authentication = getAuthentication();
 
         String username = authentication.getName();
 

@@ -4,6 +4,7 @@ import com.turkcell.soccer.dto.response.AccountInfoResponse;
 import com.turkcell.soccer.dto.response.AccountResponse;
 import com.turkcell.soccer.dto.response.AccountUpdateResponse;
 import com.turkcell.soccer.model.Account;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

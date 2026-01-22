@@ -1,13 +1,10 @@
 package com.turkcell.soccer.controller;
 
 import com.turkcell.soccer.dto.request.AuthRequest;
-import com.turkcell.soccer.dto.response.AccountResponse;
 import com.turkcell.soccer.model.Account;
 import com.turkcell.soccer.service.AccountService;
 import com.turkcell.soccer.security.common.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;

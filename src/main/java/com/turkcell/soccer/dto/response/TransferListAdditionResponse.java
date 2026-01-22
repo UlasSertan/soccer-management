@@ -4,20 +4,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class TeamResponse {
+public class TransferListAdditionResponse {
 
     @NotNull
-    private Long id;
-    @NotBlank
-    private String name;
-    @NotBlank
-    private String country;
-
+    private Integer price;
     @NotNull
-    private Integer budget;
-
+    private Long playerId;
+    @NotNull
+    private LocalDateTime timeStamp;
 }

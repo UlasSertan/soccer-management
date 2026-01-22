@@ -1,18 +1,15 @@
 package com.turkcell.soccer.exception.handler;
 
 import com.turkcell.soccer.dto.response.ErrorResponse;
-import com.turkcell.soccer.exception.AlreadyHasTeamException;
-import com.turkcell.soccer.exception.InvalidTokenException;
-import com.turkcell.soccer.exception.NoSuchPlayerException;
-import com.turkcell.soccer.exception.NoSuchTeamException;
+import com.turkcell.soccer.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.nio.file.AccessDeniedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -65,4 +62,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAlreadyHasTeam(AlreadyHasTeamException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+
+    @ExceptionHandler(BadInputException.class)
+    public ResponseEntity<String> handleBadInputException(BadInputException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(PlayerNotInTransferListException.class)
+    public ResponseEntity<String> handlePlayerNotInTransferList(PlayerNotInTransferListException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(PlayerAlreadyInTransferListException.class)
+    public ResponseEntity<String> handlePlayerAlreadyInTransferList(PlayerAlreadyInTransferListException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
 }

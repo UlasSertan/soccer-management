@@ -46,20 +46,20 @@ public class TeamService {
 
         Team team = account.getTeam();
         if (team != null) {
-            throw new AlreadyHasTeamException("Account already has team");
+            return teamMapper.toTeamResponse(account.getTeam());
         }
 
         // Create the team
         team = new Team();
-        team.setName(teamRequest.getTeamName());
+        team.setName(teamRequest.getName());
         team.setCountry(teamRequest.getCountry());
         team.setPlayers(RandomPlayerGeneration.initializeSquad(team));
 
-        // Save the team to the DB
-        Team saved = teamRepository.save(team);
 
+        Team saved = teamRepository.save(team);
         // Save the changes in account to the DB (Addition of a team)
-        account.setTeam(saved);
+        account.setTeam(team);
+        // Save the team to the DB
         accountRepository.save(account);
 
         return teamMapper.toTeamResponse(saved);
