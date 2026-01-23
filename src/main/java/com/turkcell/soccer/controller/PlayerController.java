@@ -1,5 +1,6 @@
 package com.turkcell.soccer.controller;
 
+import com.turkcell.soccer.annotation.RateLimit;
 import com.turkcell.soccer.dto.PlayerDto;
 import com.turkcell.soccer.dto.request.PlayerRequest;
 import com.turkcell.soccer.dto.response.PlayerResponse;
@@ -39,12 +40,14 @@ public class PlayerController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<PlayerResponse> createPlayer(@Valid @RequestBody PlayerRequest PlayerRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(playerService.createPlayer(PlayerRequest));
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')") // Custom exception for authorization
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<PlayerResponse> updatePlayer(@PathVariable Long id,
                                                            @Valid @RequestBody PlayerRequest PlayerRequest) {
         return ResponseEntity.ok(playerService.updatePlayer(id, PlayerRequest));
@@ -52,6 +55,7 @@ public class PlayerController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit(capacity = 10, timeInSeconds = 60)
     public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
         playerService.deletePlayer(id);
         return ResponseEntity.noContent().build();

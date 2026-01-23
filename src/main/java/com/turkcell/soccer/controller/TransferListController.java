@@ -1,5 +1,6 @@
 package com.turkcell.soccer.controller;
 
+import com.turkcell.soccer.annotation.RateLimit;
 import com.turkcell.soccer.dto.TransferListFilter;
 import com.turkcell.soccer.dto.request.TransferListRequest;
 import com.turkcell.soccer.dto.response.PurchaseResponse;
@@ -26,6 +27,7 @@ public class TransferListController {
     }
 
     @PostMapping
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TransferListAdditionResponse> addToTransferList(
             @Valid @RequestBody TransferListRequest.Add request) {
 
@@ -39,6 +41,7 @@ public class TransferListController {
 
     // To changePrice
     @PatchMapping ("/players/{playerId}")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TransferListInfoResponse>
     updateTransferList(@PathVariable Long playerId,
                        @Valid @RequestBody TransferListRequest.UpdatePrice request) {
@@ -47,12 +50,14 @@ public class TransferListController {
     }
 
     @DeleteMapping("/players/{playerId}")
+    @RateLimit(capacity = 10, timeInSeconds = 60)
     public ResponseEntity<Void> deleteTransferList(@PathVariable Long playerId) {
         transferListService.deleteTransferList(playerId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/players/{playerId}")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<PurchaseResponse> purchasePlayer(@PathVariable Long playerId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transferListService.purchasePlayer(playerId));
     }

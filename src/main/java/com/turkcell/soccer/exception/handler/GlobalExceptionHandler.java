@@ -126,4 +126,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<String> handleRateLimitExceededException(RateLimitExceededException e) {
+        log.warn("Rate Limit Exceeded: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(e.getMessage());
+    }
+
 }

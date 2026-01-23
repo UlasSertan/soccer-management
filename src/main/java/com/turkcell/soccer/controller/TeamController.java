@@ -1,6 +1,7 @@
 package com.turkcell.soccer.controller;
 
 
+import com.turkcell.soccer.annotation.RateLimit;
 import com.turkcell.soccer.docs.TeamControllerDocs;
 import com.turkcell.soccer.dto.request.AdminTeamUpdateRequest;
 import com.turkcell.soccer.dto.request.TeamRequest;
@@ -31,6 +32,7 @@ public class TeamController implements TeamControllerDocs {
 
 
     @PostMapping
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TeamResponse> createTeam(@Valid @RequestBody TeamRequest teamRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(teamService.createTeam(teamRequest));
     }
@@ -46,11 +48,13 @@ public class TeamController implements TeamControllerDocs {
     }
 
     @PatchMapping
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TeamUpdateResponse>  updateTeam(@Valid @RequestBody TeamUpdateRequest teamRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(teamService.updateTeam(teamRequest));
     }
 
     @DeleteMapping
+    @RateLimit(capacity = 10, timeInSeconds = 60)
     public ResponseEntity<Void> deleteTeam() {
         teamService.deleteTeam();
         return ResponseEntity.noContent().build();
@@ -65,6 +69,7 @@ public class TeamController implements TeamControllerDocs {
 
     @PatchMapping("/{teamId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<AdminTeamResponse> updateTeam(
             @PathVariable Long teamId,
             @Valid @RequestBody AdminTeamUpdateRequest updateRequest) {
@@ -76,6 +81,7 @@ public class TeamController implements TeamControllerDocs {
 
     @DeleteMapping("/{teamId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RateLimit(capacity = 10, timeInSeconds = 60)
     public ResponseEntity<Void> deleteTeam(@PathVariable Long teamId) {
         teamService.deleteTeam(teamId);
         return ResponseEntity.noContent().build();

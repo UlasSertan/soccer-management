@@ -1,5 +1,6 @@
 package com.turkcell.soccer.controller;
 
+import com.turkcell.soccer.annotation.RateLimit;
 import com.turkcell.soccer.dto.request.AuthRequest;
 import com.turkcell.soccer.model.Account;
 import com.turkcell.soccer.service.AccountService;
@@ -45,6 +46,7 @@ public class AuthController {
     })
     // Login
     @PostMapping("/auth")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<String> authenticateUser(@Valid @RequestBody AuthRequest authRequest) {
         Account account = accountService.authenticate(authRequest.getUsername(), authRequest.getPassword());
         // Use account to get username to prevent bugs from user input just in case
