@@ -25,10 +25,10 @@ logging:
     com.turkcell.soccer: DEBUG
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: INFO
         type:
           descriptor:
-            sql: TRACE
+            sql: INFO
 
 springdoc:
   api-docs:
