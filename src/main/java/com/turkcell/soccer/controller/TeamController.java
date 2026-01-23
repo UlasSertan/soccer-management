@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/accounts/teams")
 public class TeamController implements TeamControllerDocs {
@@ -36,6 +38,11 @@ public class TeamController implements TeamControllerDocs {
     @GetMapping
     public ResponseEntity<TeamInfoResponse> getTeamInfo() {
         return ResponseEntity.status(HttpStatus.OK).body(teamService.getTeamInfo());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<TeamInfoResponse>> getAllTeams() {
+        return ResponseEntity.status(HttpStatus.OK).body(teamService.getAllTeamsInfo());
     }
 
     @PatchMapping

@@ -18,7 +18,10 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -75,6 +78,15 @@ public class TeamService {
     public TeamInfoResponse getTeamInfo() {
         Team team = getTeam();
         return teamMapper.toTeamInfoResponse(team);
+    }
+
+    @Transactional
+    public List<TeamInfoResponse> getAllTeamsInfo() {
+        List<Team> allTeams = teamRepository.findAll();
+
+        return allTeams.stream()
+                .map(teamMapper::toTeamInfoResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
