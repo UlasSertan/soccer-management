@@ -8,6 +8,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -17,19 +18,19 @@ public class JwtUtil {
 
     // Must be 32 bytes for HS256
     private final String secret_key = "a-very-long-random-secret-key-at-least-32-bytes";
-    private final Key key = Keys.hmacShaKeyFor(secret_key.getBytes());
+    private final SecretKey key = Keys.hmacShaKeyFor(secret_key.getBytes());
 
 
     public String generateToken(String username) {
         // Create the key
         return Jwts.builder()
                 // Body
-                .setSubject(username)
+                .subject(username)
                 // Dates for expiration
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hour Token
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hour Token
                 // Sign
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
     }
 
@@ -37,21 +38,21 @@ public class JwtUtil {
         // Claims: Information carried inside the JWT payload
         // It is called claim because it is not verified until we do so
         // JWT = Header-Payload(Claims is here)-Signature
-        Claims claims = Jwts.parserBuilder() // Set parser for configuration
-                .setSigningKey(key) // Give the key for parsing
+        Claims claims = Jwts.parser() // Set parser for configuration
+                .verifyWith(key) // Give the key for parsing
                 .build() // Create the parser
-                .parseClaimsJws(token). // Parse the JWT, verify and extract claim
-                getBody(); // Return the claims object
+                .parseSignedClaims(token). // Parse the JWT, verify and extract claim
+                getPayload(); // Return the claims object
 
         return claims.getSubject(); // Return the username
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
+            Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException("Invalid or expired JWT", e);
