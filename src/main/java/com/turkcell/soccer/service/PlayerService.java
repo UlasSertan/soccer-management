@@ -14,12 +14,14 @@ import com.turkcell.soccer.mapper.PlayerMapper;
 import com.turkcell.soccer.repository.TeamRepository;
 import com.turkcell.soccer.repository.TransferListRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class PlayerService {
 
@@ -45,8 +47,7 @@ public class PlayerService {
 
     @Transactional
     public PlayerDto getPlayer(Long id) {
-        Player player = playerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchPlayerException("Player with id " + id + " not found"));
+        Player player = getPlayerFromRepo(id);
 
         return playerMapper.playerToDto(player);
     }
@@ -56,7 +57,10 @@ public class PlayerService {
         Player player = new Player();
 
         setPlayerFields(playerRequest, player);
+        playerRepository.save(player);
 
+        log.info("Player created: ID: {} Name: {} {} TeamID: {}", player.getId(), player.getFirstName(),
+                player.getLastName(), player.getTeam().getId());
         return playerMapper.playerToResponse(player);
 
     }
@@ -64,34 +68,33 @@ public class PlayerService {
 
     @Transactional
     public PlayerResponse updatePlayer(Long id, PlayerRequest request) {
-        Player player = playerRepository.findById(id).orElseThrow(
-                () ->  new NoSuchPlayerException("Player with id " + id + " not found")
-        );
+        Player player = getPlayerFromRepo(id);
 
         setPlayerFields(request, player);
+        playerRepository.save(player);
+        log.info("Player Updated: ID: {}, Name: {} {}", player.getId(), player.getFirstName(), player.getLastName());
 
         return playerMapper.playerToResponse(player);
     }
 
     @Transactional
     public void deletePlayer(Long id) {
-        System.out.println("TX ACTIVE: " +
-                TransactionSynchronizationManager.isActualTransactionActive());
-        Player player = playerRepository.findById(id).orElseThrow(
-                () ->  new NoSuchPlayerException("Player with id " + id + " not found")
-        );
+        Player player = getPlayerFromRepo(id);
         player.getTeam().removePlayer(player);
         TransferList transferList = player.getTransferList();
         if (transferList != null) {
             transferList.setPlayer(null);
         }
         playerRepository.deleteById(id);
+        log.info("Player deleted: ID: {}, Name: {} {}", player.getId(), player.getFirstName(), player.getLastName());
     }
 
     private void setPlayerFields(PlayerRequest playerRequest, Player player) {
-        Team team = teamRepository.findByName(playerRequest.getTeam()).orElseThrow(
-                () ->  new NoSuchTeamException(playerRequest.getTeam())
-        );
+        Team team = teamRepository.findByName(playerRequest.getTeam()).orElse(null);
+        if (team == null) {
+            log.warn("Team not found: Name: {}", playerRequest.getTeam());
+            throw new NoSuchTeamException(playerRequest.getTeam());
+        }
 
         player.setFirstName(playerRequest.getFirstName());
         player.setLastName(playerRequest.getLastName());
@@ -100,9 +103,21 @@ public class PlayerService {
         player.setPosition(playerRequest.getPosition());
         player.setValue(playerRequest.getValue());
         player.setTeam(team);
-        playerRepository.save(player);
+        log.debug("Player fields set: ID: {}, Name: {} {}, Country: {}, Age: {}, Position: {}, Value: {}, Team: {}",
+                player.getId(), player.getFirstName(), player.getLastName(), player.getCountry(),
+                player.getAge(), player.getPosition(), player.getValue(), player.getTeam().getName());
     }
 
+    private Player getPlayerFromRepo(Long playerId) {
+        Player player = playerRepository.findById(playerId).orElse(null);
+
+        if (player == null) {
+            log.warn("Player lookup failed: Player with id {} not found", playerId);
+            throw new NoSuchPlayerException("Player with id " + playerId + " not found");
+        }
+
+        return player;
+    }
 
 
 }

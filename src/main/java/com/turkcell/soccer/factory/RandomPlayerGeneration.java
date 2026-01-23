@@ -2,12 +2,14 @@ package com.turkcell.soccer.factory;
 
 import com.turkcell.soccer.model.Player;
 import com.turkcell.soccer.model.Team;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 public class RandomPlayerGeneration {
 
     private static final Random random = new Random();
@@ -41,6 +43,9 @@ public class RandomPlayerGeneration {
     }
 
     public static List<Player> initializeSquad(Team team) {
+        String teamName = (team != null && team.getName() != null) ? team.getName() : "New Team";
+        log.debug("Generating random squad for Team: {}", teamName);
+
         List<Player> players = new ArrayList<>();
 
         for (int i = 0; i < 20; i++) {
@@ -53,6 +58,8 @@ public class RandomPlayerGeneration {
             player.setTeam(team); // Player - Team relation
             players.add(player);
         }
+
+        log.debug("Squad generation completed. {} players created.", players.size());
 
         return players;
     }
