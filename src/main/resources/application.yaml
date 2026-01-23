@@ -21,6 +21,8 @@ spring:
 
 logging:
   level:
+    root: INFO
+    com.turkcell.soccer: DEBUG
     org:
       hibernate:
         SQL: DEBUG
