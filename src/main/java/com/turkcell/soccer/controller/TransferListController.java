@@ -35,6 +35,7 @@ public class TransferListController {
     }
 
     @GetMapping
+    @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TransferListInfoResponse> getTransferListInfo(@Valid @ModelAttribute TransferListFilter filter) {
         return ResponseEntity.ok(transferListService.getTransferList(filter));
     }
@@ -61,6 +62,8 @@ public class TransferListController {
     public ResponseEntity<PurchaseResponse> purchasePlayer(@PathVariable Long playerId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transferListService.purchasePlayer(playerId));
     }
+
+
 
 
 

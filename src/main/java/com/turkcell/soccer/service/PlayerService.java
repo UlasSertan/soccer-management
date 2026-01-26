@@ -53,6 +53,20 @@ public class PlayerService {
     }
 
     @Transactional
+    public Player getPlayerById(Long id) {
+        return getPlayerFromRepo(id);
+    }
+
+    @Transactional
+    public Player getPlayerByIdAndTeam(Long id, Long teamId) {
+        Player player = playerRepository.findByIdAndTeam_Id(id, teamId).orElse(null);
+        if (player == null) {
+            log.error("Player with id {} not found in team with id {}", id, teamId);
+        }
+        return player;
+    }
+
+    @Transactional
     public PlayerResponse createPlayer(PlayerRequest playerRequest) {
         Player player = new Player();
 

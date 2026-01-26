@@ -168,7 +168,7 @@ public class TeamService {
         }
         log.debug("Team updated: Team name: {}, country: {}", team.getName(), team.getCountry());
     }
-
+    @Transactional
     public Team getTeam() {
         Account account = accountService.getAccount();
         Team team = account.getTeam();
@@ -177,6 +177,10 @@ public class TeamService {
             throw new NoSuchTeamException("There is no team");
         }
         return team;
+    }
+    @Transactional
+    public Team getTeamById(Long teamId) {
+        return getTeamFromRepo(teamId);
     }
 
     private Team getTeamFromRepo(Long teamId) {

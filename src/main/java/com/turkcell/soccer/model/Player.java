@@ -19,6 +19,9 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @NotBlank
     @Column (nullable = false)
     private String firstName;
