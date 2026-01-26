@@ -1,5 +1,6 @@
 package com.turkcell.soccer.controller;
 
+import com.turkcell.soccer.dto.MatchResult;
 import com.turkcell.soccer.service.MatchSimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class MatchController {
     }
 
     @PostMapping("/{homeTeamId}/{awayTeamId}")
-    public ResponseEntity<MatchSimulationService.MatchResult> playGame(@PathVariable Long homeTeamId,
-                                                                       @PathVariable Long awayTeamId) {
+    public ResponseEntity<MatchResult> playGame(@PathVariable Long homeTeamId,
+                                                @PathVariable Long awayTeamId) {
 
         return ResponseEntity.ok().body(matchSimulationService.playMatch(homeTeamId, awayTeamId));
 

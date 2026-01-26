@@ -1,5 +1,6 @@
 package com.turkcell.soccer.service;
 
+import com.turkcell.soccer.dto.MatchResult;
 import com.turkcell.soccer.dto.TeamStats;
 import com.turkcell.soccer.model.Player;
 import com.turkcell.soccer.model.Team;
@@ -25,13 +26,7 @@ public class MatchSimulationService {
     public MatchSimulationService(TeamService teamService) {
         this.teamService = teamService;
     }
-    public record MatchResult(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        @Override
-        @NotNull
-        public String toString() {
-            return homeTeam + " " + homeScore + " - " + awayScore + " " + awayTeam;
-        }
-    }
+
 
     public MatchResult playMatch(Long homeTeamId, Long awayTeamId) {
         Team home = teamService.getTeamById(homeTeamId);
@@ -51,7 +46,7 @@ public class MatchSimulationService {
         int homeGoals = calculateGoals(homeEffectiveOffense, awayStats.totalDefense);
         int awayGoals = calculateGoals(awayEffectiveOffense, homeStats.totalDefense);
 
-        return new MatchResult(home.getName(), away.getName(), homeGoals, awayGoals);
+        return new MatchResult(home.getId(), away.getId(), home.getName(), away.getName(), homeGoals, awayGoals);
     }
 
     private TeamStats calculateTeamStats(Team team) {
