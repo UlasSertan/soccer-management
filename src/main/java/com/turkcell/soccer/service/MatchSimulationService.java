@@ -115,7 +115,7 @@ public class MatchSimulationService {
 
     private double calculateBasePower(Player p) {
         double currentValue = (p.getValue() != null && p.getValue() > 0) ? p.getValue() : 1000000;
-        double basePower = 50 + (20 * Math.log10(currentValue / 1_000_000.0));
+        double basePower = 50 + (20 * Math.log10(currentValue / 1_000_000.0)) + currentValue/5_000_000;
         if (basePower < 10) basePower = 10;
 
         double ageFactor = getAgeFactor(p.getAge());
@@ -144,9 +144,9 @@ public class MatchSimulationService {
     // Calculates xG
     private int calculateGoals(double offensePower, double defensePower) {
 
-        double ratio = offensePower*1.5 / (defensePower + 1);
+        double ratio = offensePower*2 / (defensePower + 1);
 
-        double lambda = 1.6 * ratio;
+        double lambda = 1.3 * ratio + 0.3;
         Random r = new Random();
         double matchTempo = 0.85 + (r.nextDouble() * 0.35);
 

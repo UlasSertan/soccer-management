@@ -1,12 +1,16 @@
 package com.turkcell.soccer.mapper;
 
 import com.turkcell.soccer.dto.LeagueDto;
+import com.turkcell.soccer.dto.LeagueStandingsDto;
+import com.turkcell.soccer.dto.PlayerStandingsDto;
 import com.turkcell.soccer.model.League;
 import com.turkcell.soccer.model.LeagueStandings;
 import com.turkcell.soccer.model.PlayerStandings;
 import com.turkcell.soccer.model.Team;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LeagueMapper {
@@ -31,4 +35,29 @@ public interface LeagueMapper {
         if (playerStanding == null) return null;
         return playerStanding.getPlayerStandingId();
     }
+
+    @Mapping(source = "team.id", target = "teamId")
+    @Mapping(source = "team.name", target = "teamName")
+    @Mapping(target = "average", expression = "java(s.getGoalsScored() - s.getGoalsConceded())")
+    LeagueStandingsDto toLeagueStandingsDto(LeagueStandings s);
+
+    List<LeagueStandingsDto> toLeagueStandingsDtoList(List<LeagueStandings> standings);
+
+
+    // --- PLAYER STANDINGS MAPPING ---
+    @Mapping(source = "player.id", target = "playerId")
+    @Mapping(target = "playerName", source = "player")
+    @Mapping(source = "player.team.name", target = "teamName")
+    PlayerStandingsDto toPlayerStandingsDto(PlayerStandings p);
+
+    List<PlayerStandingsDto> toPlayerStandingsDtoList(List<PlayerStandings> playerStandings);
+
+
+    default String mapPlayerName(com.turkcell.soccer.model.Player player) {
+        if (player == null) {
+            return null;
+        }
+        return player.getFirstName() + " " + player.getLastName();
+    }
+
 }
