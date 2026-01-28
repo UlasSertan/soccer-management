@@ -40,7 +40,7 @@ public class Team {
     @Min(0)
     private Integer budget = 5_000_000;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Player> players = new ArrayList<>();
 
     public void removePlayer(Player player) {

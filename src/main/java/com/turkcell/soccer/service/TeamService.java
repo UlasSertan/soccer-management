@@ -82,7 +82,7 @@ public class TeamService {
 
     @Transactional
     public List<TeamInfoResponse> getAllTeamsInfo() {
-        List<Team> allTeams = teamRepository.findAll();
+        List<Team> allTeams = teamRepository.findAllQuery();
 
         return allTeams.stream()
                 .map(teamMapper::toTeamInfoResponse)
@@ -184,7 +184,7 @@ public class TeamService {
     }
 
     private Team getTeamFromRepo(Long teamId) {
-        Team team  = teamRepository.findById(teamId).orElse(null);
+        Team team  = teamRepository.findByIdQuery(teamId);
         if (team == null) {
             log.warn("Team not found: ID: {}", teamId);
             throw new NoSuchTeamException("Team with id " + teamId + " does not exist");
