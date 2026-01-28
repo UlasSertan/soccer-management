@@ -43,6 +43,9 @@ public class Team {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Player> players = new ArrayList<>();
 
+    @Embedded
+    private Tactic tactic;
+
     public void removePlayer(Player player) {
         players.remove(player);
         player.setTeam(null);
@@ -54,6 +57,13 @@ public class Team {
             teamValue += player.getValue();
         }
         return teamValue;
+    }
+
+    public Tactic getTactic() {
+        if (tactic == null) {
+            return new Tactic();
+        }
+        return tactic;
     }
 
 }
