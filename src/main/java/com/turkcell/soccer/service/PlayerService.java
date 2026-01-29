@@ -62,6 +62,7 @@ public class PlayerService {
         Player player = playerRepository.findByIdAndTeam_Id(id, teamId).orElse(null);
         if (player == null) {
             log.error("Player with id {} not found in team with id {}", id, teamId);
+            throw new NoSuchPlayerException("Player with id " + id + " not found in team with id " + teamId);
         }
         return player;
     }
