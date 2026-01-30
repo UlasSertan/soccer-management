@@ -3,6 +3,7 @@ package com.turkcell.soccer.service;
 import com.turkcell.soccer.dto.MatchResult;
 import com.turkcell.soccer.dto.TeamStats;
 import com.turkcell.soccer.model.Player;
+import com.turkcell.soccer.model.Tactic;
 import com.turkcell.soccer.model.Team;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,24 +36,55 @@ public class MatchSimulationService {
         TeamStats homeStats = calculateTeamStats(home);
         TeamStats awayStats = calculateTeamStats(away);
 
+        double homeOffensiveFocus = 1;
+        double homeDefensiveFocus = 1;
+        double awayOffensiveFocus = 1;
+        double awayDefensiveFocus = 1;
+
+        switch (home.getTactic().getStyle()) {
+            case Tactic.TacticStyle.ATTACKING -> {
+                homeOffensiveFocus = 1.3;
+                homeDefensiveFocus = 0.65;
+            }
+            case Tactic.TacticStyle.DEFENSIVE -> {
+                homeOffensiveFocus = 0.5;
+                homeDefensiveFocus = 1.45;
+            }
+        }
+
+        switch (away.getTactic().getStyle()) {
+            case Tactic.TacticStyle.ATTACKING -> {
+                awayOffensiveFocus = 1.3;
+                awayDefensiveFocus = 0.65;
+            }
+            case Tactic.TacticStyle.DEFENSIVE -> {
+                awayOffensiveFocus = 0.5;
+                awayDefensiveFocus = 1.45;
+            }
+        }
+
+
+
         // Midfield effect
         double homeEffectiveOffense = homeStats.totalOffense - (awayStats.midfieldControl * 0.5);
         double awayEffectiveOffense = awayStats.totalOffense - (homeStats.midfieldControl * 0.5);
+        homeEffectiveOffense *= homeOffensiveFocus;
+        awayEffectiveOffense *= awayOffensiveFocus;
 
         // Home field advantage
         homeEffectiveOffense *= HOME_ADVANTAGE;
 
         // Goal calculation
-        int homeGoals = calculateGoals(homeEffectiveOffense, awayStats.totalDefense);
-        int awayGoals = calculateGoals(awayEffectiveOffense, homeStats.totalDefense);
+        int homeGoals = calculateGoals(homeEffectiveOffense, awayStats.totalDefense * awayDefensiveFocus);
+        int awayGoals = calculateGoals(awayEffectiveOffense, homeStats.totalDefense * homeDefensiveFocus);
 
         return new MatchResult(home.getId(), away.getId(), home.getName(), away.getName(), homeGoals, awayGoals);
     }
 
     private TeamStats calculateTeamStats(Team team) {
         TeamStats stats = new TeamStats();
-
-        for (Player p : autoSelectBestXI(team)) {
+        Tactic tactic = team.getTactic();
+        for (Player p : autoSelectBestXI(team, tactic.getDefenders(), tactic.getMidfielders(), tactic.getForwards())) {
             double performance = calculatePlayerMatchPerformance(p);
 
             Position pos = determinePosition(p);

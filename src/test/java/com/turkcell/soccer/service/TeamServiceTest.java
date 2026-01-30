@@ -1,6 +1,7 @@
 package com.turkcell.soccer.service;
 
 import com.turkcell.soccer.dto.request.AdminTeamUpdateRequest;
+import com.turkcell.soccer.dto.request.TacticCreationRequest;
 import com.turkcell.soccer.dto.request.TeamRequest;
 import com.turkcell.soccer.dto.request.TeamUpdateRequest;
 import com.turkcell.soccer.dto.response.AdminTeamResponse;
@@ -11,9 +12,9 @@ import com.turkcell.soccer.exception.NoSuchTeamException;
 import com.turkcell.soccer.mapper.TeamMapper;
 import com.turkcell.soccer.model.Account;
 import com.turkcell.soccer.model.Team;
+import com.turkcell.soccer.model.Tactic;
 import com.turkcell.soccer.repository.AccountRepository;
 import com.turkcell.soccer.repository.TeamRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -38,6 +39,8 @@ class TeamServiceTest {
     private AccountService accountService;
     @Mock
     private TeamMapper teamMapper;
+    @Mock
+    private TacticService tacticService;
 
     @InjectMocks
     private TeamService teamService;
@@ -48,24 +51,45 @@ class TeamServiceTest {
         // Given
         String name = "name";
         String country = "country";
-        Account account = new Account(); account.setTeam(null);
         TeamRequest teamRequest = new TeamRequest(name, country);
-        Team team =  new Team();
+
+        Account account = new Account();
+        account.setUsername("user1");
+        account.setTeam(null);
+
+        Team team = new Team();
         team.setName(name);
         team.setCountry(country);
+
+        Tactic defaultTactic = new Tactic(); // 4-4-2 Balanced
         TeamResponse teamResponse = new TeamResponse(1L, name, country, 5_000_000);
 
-        // When
+
         when(accountService.getAccount()).thenReturn(account);
+
+        // TacticService üzerinden varsayılan taktik kontrolü ve ataması
+        when(tacticService.findExistingTactic(any(TacticCreationRequest.class)))
+                .thenReturn(Optional.of(defaultTactic));
+
         when(teamRepository.save(any(Team.class))).thenReturn(team);
         when(teamMapper.toTeamResponse(any(Team.class))).thenReturn(teamResponse);
 
-        // Then
-        assertEquals(teamResponse, teamService.createTeam(teamRequest));
-        verify(accountService, times(1)).getAccount();
-        verify(teamRepository, times(1)).save(any(Team.class));
-        verify(teamMapper, times(1)).toTeamResponse(any(Team.class));
+        // When
+        TeamResponse result = teamService.createTeam(teamRequest);
 
+        // Then
+        assertNotNull(result);
+        assertEquals(teamResponse, result);
+
+        verify(accountService, times(1)).getAccount();
+
+        verify(tacticService, times(1)).findExistingTactic(any(TacticCreationRequest.class));
+
+        // Takımın ve hesabın kaydedildiğini doğrula
+        verify(teamRepository, times(1)).save(any(Team.class));
+        verify(accountRepository, times(1)).save(any(Account.class));
+
+        verify(teamMapper, times(1)).toTeamResponse(any(Team.class));
     }
 
     @Test

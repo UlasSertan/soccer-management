@@ -1,6 +1,8 @@
 package com.turkcell.soccer.service;
 
+import com.turkcell.soccer.dto.TacticDto;
 import com.turkcell.soccer.dto.request.AdminTeamUpdateRequest;
+import com.turkcell.soccer.dto.request.TacticCreationRequest;
 import com.turkcell.soccer.dto.request.TeamRequest;
 import com.turkcell.soccer.dto.request.TeamUpdateRequest;
 import com.turkcell.soccer.dto.response.AdminTeamResponse;
@@ -11,6 +13,7 @@ import com.turkcell.soccer.exception.NoSuchTeamException;
 import com.turkcell.soccer.factory.RandomPlayerGeneration;
 import com.turkcell.soccer.mapper.TeamMapper;
 import com.turkcell.soccer.model.Account;
+import com.turkcell.soccer.model.Tactic;
 import com.turkcell.soccer.model.Team;
 import com.turkcell.soccer.repository.AccountRepository;
 import com.turkcell.soccer.repository.TeamRepository;
@@ -32,14 +35,17 @@ public class TeamService {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final TeamMapper teamMapper;
+    private final TacticService tacticService;
 
     @Autowired
     public TeamService(TeamRepository teamRepository, AccountRepository accountRepository,
-                       AccountService accountService, TeamMapper teamMapper) {
+                       AccountService accountService, TeamMapper teamMapper,
+                       TacticService tacticService) {
         this.accountRepository = accountRepository;
         this.teamRepository = teamRepository;
         this.accountService = accountService;
         this.teamMapper = teamMapper;
+        this.tacticService = tacticService;
     }
 
 
@@ -59,6 +65,7 @@ public class TeamService {
         team.setName(teamRequest.getName());
         team.setCountry(teamRequest.getCountry());
         team.setPlayers(RandomPlayerGeneration.initializeSquad(team));
+        assignDefaultTactic(team);
 
         log.debug("Preparing team: Name: {}, Country: {}", team.getName(), team.getCountry());
 
@@ -98,6 +105,18 @@ public class TeamService {
 
 
         return teamMapper.toAdminTeamResponse(team);
+    }
+
+    @Transactional
+    public TacticDto setTactic(TacticCreationRequest tacticRequest) {
+        Team team =  getTeam();
+        Tactic tactic = tacticService.findExistingTactic(tacticRequest)
+                .orElseGet(() -> tacticService.createTactic(tacticRequest));
+
+        tactic.getTeams().add(team);
+        team.setTactic(tactic);
+
+        return tacticService.toTacticDto(tactic);
     }
 
     @Transactional
@@ -193,6 +212,16 @@ public class TeamService {
             throw new NoSuchTeamException("Team with id " + teamId + " does not exist");
         }
         return team;
+    }
+
+    private void assignDefaultTactic(Team team) {
+        TacticCreationRequest defaultRequest = new TacticCreationRequest(4, 4, 2, Tactic.TacticStyle.BALANCED);
+        Tactic tactic = tacticService.findExistingTactic(defaultRequest)
+                .orElseGet(() -> tacticService.createTactic(defaultRequest));
+
+        team.setTactic(tactic);
+        tactic.getTeams().add(team);
+        log.info("Default 4-4-2 BALANCED tactic assigned to team: {}", team.getName());
     }
 
 }

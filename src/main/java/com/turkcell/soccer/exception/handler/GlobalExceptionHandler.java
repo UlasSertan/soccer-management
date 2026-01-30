@@ -132,4 +132,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(e.getMessage());
     }
 
+    @ExceptionHandler(DuplicateTacticException.class)
+    public ResponseEntity<String> handleDuplicateTactic(DuplicateTacticException e) {
+        log.warn("Duplicate Tactic: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
 }

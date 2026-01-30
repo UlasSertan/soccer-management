@@ -2,6 +2,7 @@ package com.turkcell.soccer.service;
 
 import com.turkcell.soccer.dto.MatchResult;
 import com.turkcell.soccer.model.Player;
+import com.turkcell.soccer.model.Tactic;
 import com.turkcell.soccer.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -41,6 +42,13 @@ class MatchSimulationServiceTest {
         team.setName(teamName);
         team.setCountry("Turkey");
 
+        Tactic tactic = new Tactic();
+        tactic.setStyle(Tactic.TacticStyle.BALANCED);
+        tactic.setDefenders(4);
+        tactic.setMidfielders(4);
+        tactic.setForwards(2);
+        team.setTactic(tactic);
+
         List<Player> players = new ArrayList<>();
 
         // 1 Goalkeeper
@@ -76,8 +84,65 @@ class MatchSimulationServiceTest {
         player.setValue(value);
         return player;
     }
+    private Tactic createDefaultTactic() {
+        Tactic tactic = new Tactic();
+        tactic.setId(1L);
+        tactic.setDefenders(4);
+        tactic.setMidfielders(4);
+        tactic.setForwards(2);
+        tactic.setStyle(Tactic.TacticStyle.BALANCED);
+        return tactic;
+    }
+
+    private Team createTeamWithCustomValues(Long teamId, String teamName, int playerValue) {
+        Team team = new Team();
+        team.setId(teamId);
+        team.setName(teamName);
+        team.setCountry("Turkey");
+        team.setTactic(createDefaultTactic()); // EKLENDİ
+
+        List<Player> players = new ArrayList<>();
+        players.add(createPlayer(teamId * 100 + 1, "GK", "Player", "Goalkeeper", 25, playerValue));
+        for (int i = 0; i < 4; i++) {
+            players.add(createPlayer(teamId * 100 + 2 + i, "DEF" + i, "Player", "Defender", 26, playerValue));
+        }
+        for (int i = 0; i < 4; i++) {
+            players.add(createPlayer(teamId * 100 + 6 + i, "MID" + i, "Player", "Midfielder", 27, playerValue));
+        }
+        for (int i = 0; i < 2; i++) {
+            players.add(createPlayer(teamId * 100 + 10 + i, "FWD" + i, "Player", "Forward", 24, playerValue));
+        }
+
+        team.setPlayers(players);
+        return team;
+    }
+
+    private Team createTeamWithCustomAge(Long teamId, String teamName, int playerAge) {
+        Team team = new Team();
+        team.setId(teamId);
+        team.setName(teamName);
+        team.setCountry("Turkey");
+        team.setTactic(createDefaultTactic()); // EKLENDİ
+
+        List<Player> players = new ArrayList<>();
+        players.add(createPlayer(teamId * 100 + 1, "GK", "Player", "Goalkeeper", playerAge, 2_000_000));
+        for (int i = 0; i < 4; i++) {
+            players.add(createPlayer(teamId * 100 + 2 + i, "DEF" + i, "Player", "Defender", playerAge, 1_500_000));
+        }
+        for (int i = 0; i < 4; i++) {
+            players.add(createPlayer(teamId * 100 + 6 + i, "MID" + i, "Player", "Midfielder", playerAge, 2_500_000));
+        }
+        for (int i = 0; i < 2; i++) {
+            players.add(createPlayer(teamId * 100 + 10 + i, "FWD" + i, "Player", "Forward", playerAge, 3_000_000));
+        }
+
+        team.setPlayers(players);
+        return team;
+    }
 
     // ==================== playMatch Tests ====================
+
+
 
     @Test
     void playMatch_whenValidTeams_shouldReturnMatchResult() {
@@ -151,6 +216,8 @@ class MatchSimulationServiceTest {
         weakTeam.setId(1L);
         weakTeam.setName("Weak FC");
         weakTeam.setCountry("Turkey");
+        weakTeam.setTactic(createDefaultTactic());
+
 
         List<Player> players = new ArrayList<>();
         players.add(createPlayer(1L, "GK", "Only", "Goalkeeper", 25, 1_000_000));
@@ -178,6 +245,8 @@ class MatchSimulationServiceTest {
         noGkTeam.setId(1L);
         noGkTeam.setName("No GK FC");
         noGkTeam.setCountry("Turkey");
+        noGkTeam.setTactic(createDefaultTactic());
+
 
         List<Player> players = new ArrayList<>();
         // Only outfield players
@@ -212,6 +281,7 @@ class MatchSimulationServiceTest {
         forwardOnlyTeam.setId(1L);
         forwardOnlyTeam.setName("Attack FC");
         forwardOnlyTeam.setCountry("Turkey");
+        forwardOnlyTeam.setTactic(createDefaultTactic());
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
@@ -239,6 +309,7 @@ class MatchSimulationServiceTest {
         defenderOnlyTeam.setId(1L);
         defenderOnlyTeam.setName("Defense FC");
         defenderOnlyTeam.setCountry("Turkey");
+        defenderOnlyTeam.setTactic(createDefaultTactic());
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
@@ -266,6 +337,7 @@ class MatchSimulationServiceTest {
         midfielderOnlyTeam.setId(1L);
         midfielderOnlyTeam.setName("Midfield FC");
         midfielderOnlyTeam.setCountry("Turkey");
+        midfielderOnlyTeam.setTactic(createDefaultTactic());
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
@@ -406,6 +478,7 @@ class MatchSimulationServiceTest {
         nullPosTeam.setId(1L);
         nullPosTeam.setName("Null Pos FC");
         nullPosTeam.setCountry("Turkey");
+        nullPosTeam.setTactic(createDefaultTactic());
 
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
@@ -466,6 +539,7 @@ class MatchSimulationServiceTest {
         emptyTeam.setId(1L);
         emptyTeam.setName("Empty FC");
         emptyTeam.setCountry("Turkey");
+        emptyTeam.setTactic(createDefaultTactic());
         emptyTeam.setPlayers(new ArrayList<>());
 
         // When
@@ -489,6 +563,7 @@ class MatchSimulationServiceTest {
         largeTeam.setId(1L);
         largeTeam.setName("Large FC");
         largeTeam.setCountry("Turkey");
+        largeTeam.setTactic(createDefaultTactic());
 
         List<Player> players = new ArrayList<>();
         // 3 Goalkeepers
@@ -593,56 +668,8 @@ class MatchSimulationServiceTest {
         assertNotNull(result);
     }
 
-    // ==================== Helper Methods ====================
 
-    private Team createTeamWithCustomValues(Long teamId, String teamName, int playerValue) {
-        Team team = new Team();
-        team.setId(teamId);
-        team.setName(teamName);
-        team.setCountry("Turkey");
 
-        List<Player> players = new ArrayList<>();
-        players.add(createPlayer(teamId * 100 + 1, "GK", "Player", "Goalkeeper", 25, playerValue));
-        for (int i = 0; i < 4; i++) {
-            players.add(createPlayer(teamId * 100 + 2 + i, "DEF" + i, "Player", "Defender", 26, playerValue));
-        }
-        for (int i = 0; i < 4; i++) {
-            players.add(createPlayer(teamId * 100 + 6 + i, "MID" + i, "Player", "Midfielder", 27, playerValue));
-        }
-        for (int i = 0; i < 2; i++) {
-            players.add(createPlayer(teamId * 100 + 10 + i, "FWD" + i, "Player", "Forward", 24, playerValue));
-        }
-
-        team.setPlayers(players);
-        return team;
-    }
-
-    private Team createTeamWithCustomAge(Long teamId, String teamName, int playerAge) {
-        Team team = new Team();
-        team.setId(teamId);
-        team.setName(teamName);
-        team.setCountry("Turkey");
-
-        List<Player> players = new ArrayList<>();
-        players.add(createPlayer(teamId * 100 + 1, "GK", "Player", "Goalkeeper", playerAge, 2_000_000));
-        for (int i = 0; i < 4; i++) {
-            players.add(createPlayer(teamId * 100 + 2 + i, "DEF" + i, "Player", "Defender", playerAge, 1_500_000));
-        }
-        for (int i = 0; i < 4; i++) {
-            players.add(createPlayer(teamId * 100 + 6 + i, "MID" + i, "Player", "Midfielder", playerAge, 2_500_000));
-        }
-        for (int i = 0; i < 2; i++) {
-            players.add(createPlayer(teamId * 100 + 10 + i, "FWD" + i, "Player", "Forward", playerAge, 3_000_000));
-        }
-
-        team.setPlayers(players);
-        return team;
-    }
-
-    // KALDIR: playMatch_whenPlayerHasUnknownPosition_shouldDefaultToMidfielder
-// KALDIR: playMatch_whenTeamHasNullValuePlayers_shouldPlayMatch
-
-// YENİ TESTLER:
 
     @Test
     void playMatch_whenTeamHasMinimumValuePlayers_shouldPlayMatch() {

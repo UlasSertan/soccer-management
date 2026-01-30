@@ -1,7 +1,10 @@
 package com.turkcell.soccer.factory;
 
+import com.turkcell.soccer.dto.request.TacticCreationRequest;
 import com.turkcell.soccer.model.Player;
+import com.turkcell.soccer.model.Tactic;
 import com.turkcell.soccer.model.Team;
+import com.turkcell.soccer.service.TeamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 

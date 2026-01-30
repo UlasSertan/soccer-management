@@ -3,7 +3,9 @@ package com.turkcell.soccer.controller;
 
 import com.turkcell.soccer.annotation.RateLimit;
 import com.turkcell.soccer.docs.TeamControllerDocs;
+import com.turkcell.soccer.dto.TacticDto;
 import com.turkcell.soccer.dto.request.AdminTeamUpdateRequest;
+import com.turkcell.soccer.dto.request.TacticCreationRequest;
 import com.turkcell.soccer.dto.request.TeamRequest;
 import com.turkcell.soccer.dto.request.TeamUpdateRequest;
 import com.turkcell.soccer.dto.response.*;
@@ -51,6 +53,12 @@ public class TeamController implements TeamControllerDocs {
     @RateLimit(capacity = 20, timeInSeconds = 60)
     public ResponseEntity<TeamUpdateResponse>  updateTeam(@Valid @RequestBody TeamUpdateRequest teamRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(teamService.updateTeam(teamRequest));
+    }
+
+    @PatchMapping("/tactics")
+    @RateLimit(capacity = 20, timeInSeconds = 60)
+    public ResponseEntity<TacticDto> updateTactic(@Valid @RequestBody TacticCreationRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(teamService.setTactic(request));
     }
 
     @DeleteMapping
