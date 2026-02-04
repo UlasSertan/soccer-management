@@ -55,11 +55,11 @@ public class TransferSpecification {
 
     public static Specification<TransferList> minValue(Integer minValue) {
         return (root, query, criteriaBuilder)
-                -> minValue == null ? null : criteriaBuilder.greaterThan(root.get("value"), minValue);
+                -> minValue == null ? null : criteriaBuilder.greaterThan(root.get("price"), minValue);
     }
 
     public static Specification<TransferList> maxValue(Integer maxValue) {
         return (root, query, criteriaBuilder)
-                -> maxValue == null ? null : criteriaBuilder.lessThan(root.get("value"), maxValue);
+                -> maxValue == null ? null : criteriaBuilder.lessThan(root.get("price"), maxValue);
     }
 }
