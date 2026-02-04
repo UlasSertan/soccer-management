@@ -62,7 +62,7 @@ public class TransferListService {
 
         if (player == null) {
             log.warn("Player not found with TeamID: {}, playerId: {}", team.getId(), request.getPlayerId());
-            throw new NoSuchPlayerException("Player not found!");
+            throw new NoSuchPlayerException("Player not found in your team!");
         }
 
         if (transferListRepository.existsByPlayer(player)) {
